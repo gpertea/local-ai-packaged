@@ -4,7 +4,7 @@
 quickly bootstraps a fully featured Local AI and Low Code development
 environment including Ollama for your local LLMs, Open WebUI for an interface to chat with your N8N agents, and Supabase for your database, vector store, and authentication. 
 
-This is Cole's version with a couple of improvements and the addition of Supabase, Open WebUI, Flowise, SearXNG, and Caddy!
+This is Cole's version with a couple of improvements and the addition of Supabase, Open WebUI, Flowise, SearXNG
 Postgres was also removed since Supabase runs Postgres under the hood.
 Also, the local RAG AI Agent workflow from the video will be automatically in your 
 n8n instance if you use this setup instead of the base one provided by n8n!
@@ -49,8 +49,6 @@ kept unlike Postgres since it's faster than Supabase so sometimes is the better 
 ✅ [**SearXNG**](https://searxng.org/) - Open-source, free internet metasearch engine which aggregates 
 results from up to 229 search services. Users are neither tracked nor profiled, hence the fit with the local AI package.
 
-✅ [**Caddy**](https://caddyserver.com/) - Managed HTTPS/TLS for custom domains
-
 ## Prerequisites
 
 Before you begin, make sure you have the following software installed:
@@ -93,7 +91,7 @@ Before running the services, you need to set up your environment variables for S
 > [!IMPORTANT]
 > Make sure to generate secure random values for all secrets. Never use the example values in production.
 
-3. Set the following environment variables if deploying to production, otherwise leave commented:
+3. If using caddy, set the following environment variables if deploying to production, otherwise leave commented:
    ```bash
    ############
    # Caddy Config
@@ -110,39 +108,12 @@ Before running the services, you need to set up your environment variables for S
 
 ---
 
-The project includes a `start_services.py` script that handles starting both the Supabase and local AI services. The script accepts a `--profile` flag to specify which GPU configuration to use.
+The project includes a `start_services.py` script that handles starting both the Supabase and local AI services. 
 
-### For Nvidia GPU users
-
-```bash
-python start_services.py --profile gpu-nvidia
-```
-
-> [!NOTE]
-> If you have not used your Nvidia GPU with Docker before, please follow the
-> [Ollama Docker instructions](https://github.com/ollama/ollama/blob/main/docs/docker.md).
-
-### For AMD GPU users on Linux
 
 ```bash
-python start_services.py --profile gpu-amd
+python start_services.py
 ```
-
-### For Mac / Apple Silicon users
-
-If you're using a Mac with an M1 or newer processor, you can't expose your GPU to the Docker instance, unfortunately. There are two options in this case:
-
-1. Run the starter kit fully on CPU:
-   ```bash
-   python start_services.py --profile cpu
-   ```
-
-2. Run Ollama on your Mac for faster inference, and connect to that from the n8n instance:
-   ```bash
-   python start_services.py --profile none
-   ```
-
-   If you want to run Ollama on your mac, check the [Ollama homepage](https://ollama.com/) for installation instructions.
 
 #### For Mac users running OLLAMA locally
 
@@ -260,7 +231,7 @@ docker compose -p localai -f docker-compose.yml -f supabase/docker/docker-compos
 docker compose -p localai -f docker-compose.yml -f supabase/docker/docker-compose.yml pull
 
 # Start services again with your desired profile
-python start_services.py --profile <your-profile>
+python start_services.py
 ```
 
 Replace `<your-profile>` with one of: `cpu`, `gpu-nvidia`, `gpu-amd`, or `none`.
