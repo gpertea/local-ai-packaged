@@ -2,6 +2,8 @@
 .env.test
 volumes/
 shared/
+neo4j/
+shared-backup/
 supabase/
-searxng/uwsgi.ini
 searxng/settings.yml
+searxng/uwsgi*

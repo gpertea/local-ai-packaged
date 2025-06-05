@@ -139,6 +139,21 @@ Additionally, after you see "Editor is now accessible via: http://localhost:5678
 python start_services.py --profile cpu
 ```
 
+### The environment argument
+The `start_services.py` script accepts an optional `--environment` flag with two values:
+
+- **private** (default): deploys the stack with ports exposed only to localhost for development
+- **public**: closes all service ports except 80 and 443 when running in a public environment
+
+Running
+```bash
+python start_services.py --profile cpu --environment private
+```
+is equivalent to
+```bash
+python start_services.py --profile cpu
+```
+
 ## Deploying to the Cloud
 
 ### Prerequisites for the below steps
@@ -151,10 +166,14 @@ Before running the above commands to pull the repo and install everything:
 
 1. Run the commands as root to open up the necessary ports:
    - ufw enable
-   - ufw allow 8000 && ufw allow 3001 && ufw allow 3000 && ufw allow 5678 && ufw allow 80 && ufw allow 443
-   - ufw allow 8080 (if you want to expose SearXNG)
-   - ufw allow 11434 (if you want to expose Ollama)
+   - ufw allow 80 && ufw allow 443
    - ufw reload
+   ---
+   **WARNING**
+
+   ufw does not shield ports published by docker, because the iptables rules configured by docker are analyzed before those configured by ufw. There is a solution to change this behavior, but that is out of scope for this project. Make sure all traffic runs through port 443.
+
+   ---
 
 2. Set up A records for your DNS provider to point your subdomains you'll set up in the .env file for Caddy
 to the IP address of your cloud instance.
@@ -225,13 +244,13 @@ To update all containers to their latest versions (n8n, Open WebUI, etc.), run t
 
 ```bash
 # Stop all services
-docker compose -p localai -f docker-compose.yml -f supabase/docker/docker-compose.yml down
+docker compose -p localai -f docker-compose.yml --profile <your-profile> down
 
 # Pull latest versions of all containers
-docker compose -p localai -f docker-compose.yml -f supabase/docker/docker-compose.yml pull
+docker compose -p localai -f docker-compose.yml --profile <your-profile> pull
 
 # Start services again with your desired profile
-python start_services.py
+python start_services.py --profile <your-profile>
 ```
 
 Replace `<your-profile>` with one of: `cpu`, `gpu-nvidia`, `gpu-amd`, or `none`.
