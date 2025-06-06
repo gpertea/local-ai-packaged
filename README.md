@@ -1,13 +1,14 @@
 # Self-hosted AI Package
 
-**Self-hosted AI Package** is an open, docker compose template that
-quickly bootstraps a fully featured Local AI and Low Code development
+**Self-hosted AI Package** is an open, docker compose template that quickly bootstraps a fully featured Local AI and Low Code development
 environment including Ollama for your local LLMs, Open WebUI for an interface to chat with your N8N agents, and Supabase for your database, vector store, and authentication. 
 
-This is Cole's version with a couple of improvements and the addition of Supabase, Open WebUI, Flowise, SearXNG
+Based on n8n project, Cole's version added a couple of improvements and the addition of Supabase, Open WebUI, Flowise, SearXNG
 Postgres was also removed since Supabase runs Postgres under the hood.
-Also, the local RAG AI Agent workflow from the video will be automatically in your 
-n8n instance if you use this setup instead of the base one provided by n8n!
+
+Geo's version (this repository) removes local ollama (assuming ollama is running on another host) and caddy. 
+We also want to add Neo4j and a web crawler component (crawl4ai or firecrawl self-hosted). 
+
 
 ## Important Links
 
@@ -15,9 +16,7 @@ n8n instance if you use this setup instead of the base one provided by n8n!
 
 - [GitHub Kanban board](https://github.com/users/coleam00/projects/2/views/1) for feature implementation and bug squashing.
 
-- [Original Local AI Starter Kit](https://github.com/n8n-io/self-hosted-ai-starter-kit) by the n8n team
-
-- Download my N8N + OpenWebUI integration [directly on the Open WebUI site.](https://openwebui.com/f/coleam/n8n_pipe/) (more instructions below)
+- Download Cole's N8N + OpenWebUI integration [directly on the Open WebUI site.](https://openwebui.com/f/coleam/n8n_pipe/) (more instructions below)
 
 ![n8n.io - Screenshot](https://raw.githubusercontent.com/n8n-io/self-hosted-ai-starter-kit/main/assets/n8n-demo.gif)
 
