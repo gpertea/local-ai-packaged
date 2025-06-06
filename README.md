@@ -209,7 +209,41 @@ Before running the above commands to pull the repo and install everything:
 
 3. Set up A records for your DNS provider to point your chosen subdomains to the IP address of your cloud instance.
 
-   For example, set an A record to point n8n to [cloud instance IP] for n8n.yourdomain.com
+  For example, set an A record to point n8n to [cloud instance IP] for n8n.yourdomain.com
+
+## Hosting on a Home LAN with Nginx Proxy Manager
+
+If you want to run the stack on a machine in your local network but still reach
+it from the internet, you can place an [Nginx Proxy Manager](https://nginxproxymanager.com/)
+instance on another host. The following example assumes your LAN uses the
+`192.168.2.1/24` subnet.
+
+1. Give the server running this repository a static address (e.g.
+   `192.168.2.20`) and start the services in **public** mode so they are
+   reachable from the LAN:
+
+   ```bash
+   python start_services.py --profile cpu --environment public
+   ```
+
+2. Run Nginx Proxy Manager on a different machine in the same LAN (for example
+   `192.168.2.10`) and forward ports **80** and **443** from your router to that
+   host.
+
+3. Create an `A` record with your DNS provider that points
+   `ai.melokalia.org` to your router's public IP address.
+
+4. In the Nginx Proxy Manager UI, add proxy hosts for each authenticated
+   service you want to expose:
+
+   - `open-webui.ai.melokalia.org` → `http://192.168.2.20:8080`
+   - `n8n.ai.melokalia.org` → `http://192.168.2.20:5678`
+   - `flowise.ai.melokalia.org` → `http://192.168.2.20:3001`
+
+   Enable SSL certificates (e.g. via Let's Encrypt) for each proxy host.
+
+Only these authenticated services are exposed publicly; the rest of the stack
+remains accessible solely within your LAN.
 
 ## ⚡️ Quick start and usage
 
