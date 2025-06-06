@@ -16,9 +16,7 @@ n8n instance if you use this setup instead of the base one provided by n8n!
 
 - [Original Local AI Starter Kit](https://github.com/n8n-io/self-hosted-ai-starter-kit) by the n8n team
 
-- Download my N8N + OpenWebUI integration [directly on the Open WebUI site.](https://openwebui.com/f/coleam/n8n_pipe/) (more instructions below)
-
-![n8n.io - Screenshot](https://raw.githubusercontent.com/n8n-io/self-hosted-ai-starter-kit/main/assets/n8n-demo.gif)
+- Download Cole's N8N + OpenWebUI integration [directly on the Open WebUI site.](https://openwebui.com/f/coleam/n8n_pipe/) (more instructions below)
 
 Curated by <https://github.com/n8n-io> and <https://github.com/coleam00>, it combines the self-hosted n8n
 platform with a curated list of compatible AI products and components to
@@ -32,7 +30,7 @@ integrations and advanced AI components
 ✅ [**Supabase**](https://supabase.com/) - Open source database as a service -
 most widely used database for AI agents
 
-✅ **Ollama** - Connect to a running Ollama instance for local LLMs
+✅ **Ollama** - Connect to a running Ollama instance for local LLMs (not included)
 
 ✅ [**Open WebUI**](https://openwebui.com/) - ChatGPT-like interface to
 privately interact with your local models and N8N agents
@@ -63,7 +61,7 @@ Before you begin, make sure you have the following software installed:
 
 Clone the repository and navigate to the project directory:
 ```bash
-git clone -b stable https://github.com/coleam00/local-ai-packaged.git
+git clone -b upstream https://github.com/gpertea/local-ai-packaged.git
 cd local-ai-packaged
 ```
 
@@ -231,14 +229,14 @@ instance on another host. The following example assumes your LAN uses the
    host.
 
 3. Create an `A` record with your DNS provider that points
-   `ai.melokalia.org` to your router's public IP address.
+   `melokalia.org` to your router's public IP address.
 
 4. In the Nginx Proxy Manager UI, add proxy hosts for each authenticated
    service you want to expose:
 
-   - `open-webui.ai.melokalia.org` → `http://192.168.2.20:8080`
-   - `n8n.ai.melokalia.org` → `http://192.168.2.20:5678`
-   - `flowise.ai.melokalia.org` → `http://192.168.2.20:3001`
+   - `ow.melokalia.org` → `http://192.168.2.20:8080`
+   - `n8n.melokalia.org` → `http://192.168.2.20:5678`
+   - `flow.melokalia.org` → `http://192.168.2.20:3001`
 
    Enable SSL certificates (e.g. via Let's Encrypt) for each proxy host.
 
