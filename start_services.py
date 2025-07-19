@@ -14,11 +14,73 @@ import time
 import argparse
 import platform
 import sys
+import grp, re, textwrap
 
 def run_command(cmd, cwd=None):
     """Run a shell command and print it."""
     print("Running:", " ".join(cmd))
     subprocess.run(cmd, cwd=cwd, check=True)
+
+def _host_ids():
+    """
+    Return (uid, gid) where:
+      uid = current login user ID
+      gid = host 'docker' group ID if it exists, else primary gid
+    """
+    uid = os.getuid()
+    try:
+        gid = grp.getgrnam("docker").gr_gid
+    except KeyError:
+        gid = os.getgid()
+    return uid, gid
+
+def patch_searxng_dockerfile():
+    ### rewrite ARG SEARXNG_UID/GID in searxng/Dockerfile 
+    df_path = os.path.join("searxng", "Dockerfile")
+    if not os.path.exists(df_path):
+        print(f"[skip] {df_path} not found")
+        return
+    uid, gid = _host_ids()
+
+    with open(df_path, "r", encoding="utf-8") as fh:
+        text = fh.read()
+
+    new = re.sub(r"ARG\s+SEARXNG_UID=\d+", f"ARG SEARXNG_UID={uid}", text)
+    new = re.sub(r"ARG\s+SEARXNG_GID=\d+", f"ARG SEARXNG_GID={gid}", new)
+
+    if new != text:
+        with open(df_path, "w", encoding="utf-8") as fh:
+            fh.write(new)
+        print(f"[patched] {df_path} ? UID={uid} GID={gid}")
+    else:
+        print(f"[ok] {df_path} already uses host UID/GID")
+
+
+def patch_compose_for_local_build():
+    """
+    Ensure the searxng service in docker-compose.yml builds from the local
+    Dockerfile instead of pulling the upstream image.
+    """
+    comp = "docker-compose.yml"
+    if not os.path.exists(comp):
+        return
+    with open(comp, "r", encoding="utf-8") as fh:
+        data = fh.read()
+
+    # Replace a line like 'image: searxng/searxng:1.0' with:
+    #   build: ./searxng
+    #   image: searxng:local
+    pattern = r"(^\s*searxng:[\s\S]+?)(^\s*image:\s*searxng/.*$)"
+    m = re.search(pattern, data, flags=re.MULTILINE)
+    if m:
+        indent = re.match(r"\s*", m.group(2)).group(0)
+        replacement = textwrap.dedent(f"""\
+        {indent}build: ./searxng
+        {indent}image: searxng:local""")
+        data = data.replace(m.group(2), replacement)
+        with open(comp, "w", encoding="utf-8") as fh:
+            fh.write(data)
+        print("[patched] docker-compose.yml ? searxng will be built locally")
 
 def clone_supabase_repo():
     """Clone the Supabase repository using sparse checkout if not already present."""
@@ -74,7 +136,8 @@ def start_local_ai(profile=None, environment=None):
         cmd.extend(["-f", "docker-compose.override.private.yml"])
     if environment and environment == "public":
         cmd.extend(["-f", "docker-compose.override.public.yml"])
-    cmd.extend(["up", "-d"])
+    #cmd.extend(["up", "-d"])
+    cmd.extend(["up", "--build", "-d"])
     run_command(cmd)
 
 def generate_searxng_secret_key():
@@ -227,6 +290,10 @@ def main():
 
     clone_supabase_repo()
     prepare_supabase_env()
+
+    #make sure SearXNG gets host UID/GID
+    patch_searxng_dockerfile()
+    patch_compose_for_local_build()
 
     # Generate SearXNG secret key and check docker-compose.yml
     generate_searxng_secret_key()
